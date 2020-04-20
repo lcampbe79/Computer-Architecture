@@ -449,7 +449,7 @@ Set the value of a register to an integer.
 
 Machine code:
 ```
-10000010 00000rrr iiiiiiii
+10000010 00000rrr (operand)ß iiiiiiii (value)
 82 0r ii
 ```
 

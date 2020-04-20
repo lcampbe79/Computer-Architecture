@@ -60,6 +60,37 @@ but you'll have to implement those three above instructions first!
 ## Step 0: IMPORTANT: inventory what is here!
 
 * Make a list of files here.
+  [ ] comp.py: in class work
+
+  [ ] cpu.py: Creates the the "new CPU"
+    [ ] class CPU
+        [ ] def init
+          [ ] register
+          [ ] pc
+          [ ] running
+        [ ] def load
+        [ ] def alu (math ops)
+        [ ] def trace (function to print out the CPU state for debugging)
+        [ ] ram_read(self, address) takes in self and accept the address to read and return the     value stored there.
+        [ ] ram_write(self, address, value) accept a value to write, and the address to write it to
+        [ ] def run (runs the CPU)
+          [ ] LDI?
+          [ ] PRN?
+          [ ] HLT?
+
+  [ ] ls8.py: Eventually we will use that to import the examples folder
+
+  [ ] examples folder: has the different "programs" we have to implement
+
+  [ ] FAQ:  has possible answers for some questions
+
+  [ ] Cheatsheet: if specs differ I guess the specs in this file are right??
+  
+  [ ] Spec: has the in depth expression of what is eventually supposed to happen
+
+  [ ] Notes: My notes during class
+
+
 * Write a short 3-10-word description of what each file does.
 * Note what has been implemented, and what hasn't.
 * Read this whole file.

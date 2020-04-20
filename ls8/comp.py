@@ -42,13 +42,13 @@ while running:
         print('Beej') #add not print (1:45)
         pc += 1
 
-    elif instruction == SAVE_REG: #take the value 37 
+    elif instruction == SAVE_REG: #take the value 37 (read)
         register_num = memory[pc + 1]
         value = memory[pc + 2]
         register[register_num] = value
         pc += 3 # uses three 
         
-    elif instruction == PRINT_REG:
+    elif instruction == PRINT_REG: # ()
         register_num= memory[pc + 1]
         value= register[register_num]
         print(value)
