@@ -59,24 +59,24 @@ but you'll have to implement those three above instructions first!
 
 ## Step 0: IMPORTANT: inventory what is here!
 
-* Make a list of files here.
+* Make a list of files here. 
   [ ] comp.py: in class work
 
   [ ] cpu.py: Creates the the "new CPU"
-    [ ] class CPU
-        [ ] def init
-          [ ] register
-          [ ] pc
-          [ ] running
-        [ ] def load
-        [ ] def alu (math ops)
-        [ ] def trace (function to print out the CPU state for debugging)
-        [ ] ram_read(self, address) takes in self and accept the address to read and return the     value stored there.
-        [ ] ram_write(self, address, value) accept a value to write, and the address to write it to
-        [ ] def run (runs the CPU)
-          [ ] LDI?
-          [ ] PRN?
-          [ ] HLT?
+    + [ ] class CPU
+        - [ ] def init
+          - [ ] register
+          - [ ] pc
+          - [ ] running
+        - [ ] def load
+        - [ ] def alu (math ops)
+        - [ ] def trace (function to print out the CPU state for debugging)
+        - [ ] ram_read(self, address) takes in self and accept the address to read and return the value stored there.
+        - [ ] ram_write(self, address, value) accept a value to write, and the address to write it to
+        - [ ] def run (runs the CPU)
+          - [ ] LDI?
+          - [ ] PRN?
+          - [ ] HLT?
 
   [ ] ls8.py: Eventually we will use that to import the examples folder
 

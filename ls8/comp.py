@@ -1,4 +1,13 @@
+import sys
+
 # Write a program in python that runs programs
+
+# Parse the command line
+# print(sys.argv)
+# sys.exit()
+program_filename = sys.argv[1]
+print(program_filename)
+sys.exit()
 
 # OP CODES ARE LIKE INSTRUCTIONS
 
@@ -37,7 +46,8 @@ running = True
 
 while running:
     instruction = memory[pc]
-
+    #figure out what the instruction length instead of hardcoding
+    #instruction_len = FOR PROJECT
     if instruction == PRINT_BEEJ:
         print('Beej') #add not print (1:45)
         pc += 1
@@ -60,3 +70,4 @@ while running:
     else:
         print('Unknown instruction')
         running = False
+    #pc += instruction_len

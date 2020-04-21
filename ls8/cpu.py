@@ -47,12 +47,13 @@ class CPU:
         self.reg = [0] * 8  # returns 8 zeros and stores values (0-7)
         self.pc = 0 # Program counter, the index (address) of the current instruction
         self.running = True
+        self.LDI = 0b10000010
+        self.PRN = 0b01000111
+        self.HLT = 0b00000001
 
     def load(self):
         """Load a program into memory."""
-
-        address = 0 # value that's stored here
-
+        address = 0
         # For now, we've just hardcoded a program:
 
         program = [
@@ -69,32 +70,10 @@ class CPU:
 
         for instruction in program:
             self.ram[address] = instruction
-            print(self.ram)
+            # print(self.ram)
             address += 1
 
-    '''
-    There are two internal registers used for memory operations: 
-    Memory Address Register (MAR) and the Memory Data Register (MDR). 
     
-    MAR contains the address that is being read or written to. 
-    ram_read() should accept the address to read and return the value stored there. (Maybe something like: 
-        register_num= memory[pc + 1]
-        value= register[register_num] 
-    from comp.py in the while loop    
-    )
-    
-
-    MDR contains the data that was read or the data to write. 
-    ram_write() should accept a value to write, and the address to write it to.
-
-    You don't need to add the MAR or MDR to your CPU class, but they would make handy parameter names for ram_read() and ram_write()
-    '''
-
-    def ram_read(self, address):
-        return self.ram[address]
-
-    def ram_write(self, address, value):
-        pass
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations. does math"""
@@ -124,6 +103,33 @@ class CPU:
             print(" %02X" % self.reg[i], end='')
 
         print()
+    '''
+    There are two internal registers used for memory operations: 
+    Memory Address Register (MAR) and the Memory Data Register (MDR). 
+    
+    MAR contains the address that is being read or written to. 
+    ram_read() should accept the address (MAR) to read and return the value stored there. (Maybe something like: 
+        register_num= memory[pc + 1]
+        value= register[register_num] 
+    from comp.py in the while loop    
+    )
+    
+
+    MDR contains the data that was read or the data to write. 
+    ram_write() should accept a value(MDR) to write, and the address (MAR) to write it to.
+
+    You don't need to add the MAR or MDR to your CPU class, but they would make handy parameter names for ram_read() and ram_write()
+    '''
+    # MAR contains the address that is being read or written to. 
+    #ram_read() should accept the address (MAR) to read and return the value stored #there.
+    def ram_read(self, MAR):
+        return self.ram[MAR]
+    
+    # MDR contains the data that was read or the data to write. 
+    # ram_write() should accept a value(MDR) to write, and the address (MAR) to write it to.
+
+    def ram_write(self, MDR, MAR):
+        self.ram[MAR] = MDR
 
     def run(self):
         """Run the CPU."""
@@ -140,5 +146,36 @@ class CPU:
 
         In run() in your switch, exit the loop if a HLT instruction is encountered, regardless of whether or not there are more lines of code in the LS-8 program you loaded.
         '''
+        #Program counter, the index (address) of the current instruction
+        # Reads the memory address that's stored in register
+        PC = self.pc 
+        
+        while self.running:
+            
+            # Stores the result in "Instruction Register" from the memory (RAM) address in PC
+            IR = self.ram[PC]
 
-        pass
+            # `LDI` instruction (EX: SAVE_REG in comp.py)
+            if IR == self.LDI:
+                register_num = self.ram_read(PC + 1)
+                value = self.ram_read(PC + 2)
+                self.reg[register_num] = value
+                PC += 3
+            
+            #`PRN` instruction (EX: PRINT_REG in comp.py)
+            elif IR == self.PRN:
+                register_num = self.ram_read(PC + 1)
+                value = self.reg[register_num]
+                print(value)
+                PC += 2
+              
+            
+            #`HLT` instruction (EX: HALT in comp.py)
+            elif IR == self.HLT:
+                self.running = False
+            
+            #ELSE STATEMENT from comp.py
+            else:
+                print('Unknown instruction')
+                self.running = False
+        # self.trace()
