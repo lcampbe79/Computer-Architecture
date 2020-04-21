@@ -146,10 +146,11 @@ class CPU:
 
         In run() in your switch, exit the loop if a HLT instruction is encountered, regardless of whether or not there are more lines of code in the LS-8 program you loaded.
         '''
-        #Program counter, the index (address) of the current instruction
+        # Program counter, the index (address) of the current instruction
         # Reads the memory address that's stored in register
         PC = self.pc 
-        
+        # Figures out the instruction length to make the while loop more readable
+        #instruction_length = ???
         while self.running:
             
             # Stores the result in "Instruction Register" from the memory (RAM) address in PC
@@ -178,4 +179,5 @@ class CPU:
             else:
                 print('Unknown instruction')
                 self.running = False
+            #PC = 
         # self.trace()

@@ -6,8 +6,8 @@ import sys
 # print(sys.argv)
 # sys.exit()
 program_filename = sys.argv[1]
-print(program_filename)
-sys.exit()
+# print(program_filename)
+# sys.exit()
 
 # OP CODES ARE LIKE INSTRUCTIONS
 
@@ -19,6 +19,7 @@ PRINT_REG = 4 # Corresponds with PRN in the LS8
 #Global Variables - change only in one place
 
 #Memory uses a list
+"""
 memory = [
     PRINT_BEEJ,
 
@@ -33,7 +34,28 @@ memory = [
 
     HALT
 ]
+"""
+
+memory = [0] * 256
 register = [0] * 8 # like variables but named the same R0-R7 ([0] * 8 means it returns 8 zeros)(stores values)
+
+# Load program into memory
+address = 0
+
+with open(program_filename) as f:  # opens file
+    for line in f: # reads file line by line
+        # try:
+        # print(line, end='')  # prints line by line and gets rid of extra lines (end='' prints %)
+        line = line.split('#') #line = int(line) # turns the line into int instead of string, line = int(line, 2) 2 means is added for binary
+        line = line[0].strip()
+        # except ValueError:
+        if line[0] == '':
+            continue
+        memory[address] = int(line[0]) #turns the line into int instead of string store the address in memory
+
+        address +=1 #add one and goes to the next
+# sys.exit()
+
 pc = 0 # Program counter, the index (address) of the current instruction
 running = True
 
