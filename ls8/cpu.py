@@ -2,14 +2,14 @@
 
 import sys
 
-program_filename = sys.argv[1]
+# program_filename = sys.argv[1]
 # print(program_filename)
 # sys.exit()
 # print(sys.argv)
 # sys.exit()
 
 LDI = 0b10000010
-MULT = 0b10100010
+MUL = 0b10100010
 PRN = 0b01000111
 HLT = 0b00000001
 
@@ -83,6 +83,8 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == "MULT":
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -137,7 +139,7 @@ class CPU:
         #instruction_length = ???
         while self.running:
             
-            # Stores the result in "Instruction Register" from the memory (RAM) address from PC
+            # Stores the result in "Instruction Register" from the memory (RAM) address from the program
             IR = self.ram_read(self.pc)
             # register_num = self.ram_read(PC + 1) # operand_a (address)
             # value = self.ram_read(PC + 2) # operand_b (value)
@@ -148,7 +150,7 @@ class CPU:
             # self.trace()
             # `LDI` instruction (EX: SAVE_REG in comp.py)
             if IR == LDI:
-                # self.trace()
+                self.trace()
                 # print("HI")
                 register_num = self.ram_read(self.pc + 1) # operand_a (address)
                 value = self.ram_read(self.pc + 2) # operand_b (value)
@@ -157,14 +159,17 @@ class CPU:
                 # print(f'LDI: value ', self.reg[register_num])
                 self.pc += 3
 
-            # elif IR == self.MULT:
-            #     self.alu('MULT', reg_a, reg_b)
-            #     PC += 3
+            elif IR == MUL:
+                num_reg_a = self.ram_read(self.pc + 1)
+                num_reg_b = self.ram_read(self.pc + 2)
+                self.alu('MULT', num_reg_a, num_reg_b)
+                self.pc += 3
+
 
             # self.trace()
             # #`PRN` instruction (EX: PRINT_REG in comp.py)
             elif IR == PRN:
-                # self.trace()
+                self.trace()
                 register_num = self.ram_read(self.pc + 1) # operand_a (address)
                 value = self.reg[register_num]
                 # print('-----------------')
@@ -175,7 +180,7 @@ class CPU:
             # self.trace()
             #`HLT` instruction (EX: HALT in comp.py)
             elif IR == HLT:
-                # self.trace()
+                self.trace()
             #     # print('LLLLL')
                 self.running = False
             
@@ -187,7 +192,7 @@ class CPU:
                 self.running = False
             #PC =
 
-        self.trace() 
+        # self.trace() 
 
 # """CPU functionality."""
 
@@ -321,8 +326,8 @@ class CPU:
 #         if op == "ADD":
 #             self.reg[reg_a] += self.reg[reg_b]
 #         #elif op == "SUB": etc
-#         elif op == "MULT":
-#             self.reg[reg_a] *= self.reg[reg_b]
+        # elif op == "MULT":
+        #     self.reg[reg_a] *= self.reg[reg_b]
 #         else:
 #             raise Exception("Unsupported ALU operation")
     
