@@ -2,7 +2,7 @@
 
 import sys
 
-program_filename = sys.argv[1]
+# program_filename = sys.argv[1]
 # print(program_filename)
 # sys.exit()
 # print(sys.argv)
@@ -37,8 +37,14 @@ G Greater-than: during a CMP, set to 1 if registerA is greater than registerB, z
 E Equal: during a CMP, set to 1 if registerA is equal to registerB, zero otherwise.
 '''
 
+LDI = 0b10000010
+MULT = 0b10100010
+PRN = 0b01000111
+HLT = 0b00000001
+
 class CPU:
     """Main CPU class."""
+
 
     def __init__(self):
         """Construct a new CPU."""
@@ -53,23 +59,21 @@ class CPU:
         self.reg = [0] * 8  # returns 8 zeros and stores values (0-7)
         self.pc = 0 # Program counter, the index (address) of the current instruction
         self.running = True
-        self.LDI = 0b10000010
-        self.PRN = 0b01000111
-        self.HLT = 0b00000001
+        # self.MULT = 0b10100010
 
-    def load(self):
+    def load(self, program_filename):
         """Load a program into memory."""
         address = 0
         with open(program_filename) as f:  # opens file
             for line in f: # reads file line by line
                 # try:
                 # print(line, end='')  # prints line by line and gets rid of extra lines (end='' prints %)
-                line = line.split('#', 2) #line = int(line) # turns the line into int instead of string, line = int(line, 2) 2 means is added for binary
+                line = line.split('#') #line = int(line) # turns the line into int instead of string, line = int(line, 2) 2 means is added for binary
                 line = line[0].strip() #list
                 # except ValueError:
                 if line == '':
                     continue
-                self.ram[address] = int(line, 2) #turns the line into int instead of string store the address in memory
+                self.ram[address] = int(line, base=2) #turns the line into int instead of string store the address in memory
 
                 address +=1 #add one and goes to the next
         # For now, we've just hardcoded a program:
@@ -83,7 +87,7 @@ class CPU:
         #     0b01000111, # PRN R0
         #     0b00000000, # R0 (will be += 2)
 
-        #     0b00000001, # HLT (running = False)
+        #     0b00000001, # HLT (running = False) operand b
         # ]
 
         # for instruction in program:
@@ -91,36 +95,6 @@ class CPU:
         #     # print(self.ram)
         #     address += 1
 
-    
-
-    def alu(self, op, reg_a, reg_b):
-        """ALU operations. does math"""
-
-        if op == "ADD":
-            self.reg[reg_a] += self.reg[reg_b]
-        #elif op == "SUB": etc
-        else:
-            raise Exception("Unsupported ALU operation")
-
-    def trace(self):
-        """
-        Handy function to print out the CPU state. You might want to call this
-        from run() if you need help debugging.
-        """
-
-        print(f"TRACE: %02X | %02X %02X %02X |" % (
-            self.pc,
-            #self.fl,
-            #self.ie,
-            self.ram_read(self.pc),
-            self.ram_read(self.pc + 1),
-            self.ram_read(self.pc + 2)
-        ), end='')
-
-        for i in range(8):
-            print(" %02X" % self.reg[i], end='')
-
-        print()
     '''
     There are two internal registers used for memory operations: 
     Memory Address Register (MAR) and the Memory Data Register (MDR). 
@@ -148,6 +122,39 @@ class CPU:
 
     def ram_write(self, MDR, MAR):
         self.ram[MAR] = MDR
+    
+
+    def alu(self, op, reg_a, reg_b):
+        """ALU operations. does math"""
+
+        if op == "ADD":
+            self.reg[reg_a] += self.reg[reg_b]
+        #elif op == "SUB": etc
+        elif op == "MULT":
+            self.reg[reg_a] *= self.reg[reg_b]
+        else:
+            raise Exception("Unsupported ALU operation")
+    
+    def trace(self):
+        """
+        Handy function to print out the CPU state. You might want to call this
+        from run() if you need help debugging.
+        """
+
+        print(f"TRACE: %02X | %02X %02X %02X |" % (
+            self.pc,
+            #self.fl,
+            #self.ie,
+            self.ram_read(self.pc),
+            self.ram_read(self.pc + 1),
+            self.ram_read(self.pc + 2)
+        ), end='')
+
+        for i in range(8):
+            print(" %02X" % self.reg[i], end='')
+
+        print()
+    
 
     def run(self):
         """Run the CPU."""
@@ -164,6 +171,7 @@ class CPU:
 
         In run() in your switch, exit the loop if a HLT instruction is encountered, regardless of whether or not there are more lines of code in the LS-8 program you loaded.
         '''
+        self.trace()
         # Program counter, the index (address) of the current instruction
         # Reads the memory address that's stored in register
         PC = self.pc 
@@ -172,25 +180,32 @@ class CPU:
         while self.running:
             
             # Stores the result in "Instruction Register" from the memory (RAM) address in PC
-            IR = self.ram[PC]
+            IR = self.ram_read(PC)
+            register_num = self.ram_read(PC + 1) # operand_a (address)
+            value = self.ram_read(PC + 2) # operand_b (value)
+            # print(f"B;arg",IR)
 
             # `LDI` instruction (EX: SAVE_REG in comp.py)
-            if IR == self.LDI:
-                register_num = self.ram_read(PC + 1)
-                value = self.ram_read(PC + 2)
-                self.reg[register_num] = value
+            if IR == LDI:
+                # print("HI")
+                self.reg[register_num] = value # 
+                # print(f'.......',self.reg[register_num])
                 PC += 3
+
+            # elif IR == self.MULT:
+            #     self.alu('MULT', reg_a, reg_b)
+            #     PC += 3
+
             
             #`PRN` instruction (EX: PRINT_REG in comp.py)
-            elif IR == self.PRN:
-                register_num = self.ram_read(PC + 1)
-                value = self.reg[register_num]
+            elif IR == PRN:
                 print(value)
                 PC += 2
               
             
             #`HLT` instruction (EX: HALT in comp.py)
-            elif IR == self.HLT:
+            elif IR == HLT:
+                # print('LLLLL')
                 self.running = False
             
             #ELSE STATEMENT from comp.py
@@ -198,4 +213,4 @@ class CPU:
                 print('Unknown instruction')
                 self.running = False
             #PC = 
-        # self.trace()
+        
