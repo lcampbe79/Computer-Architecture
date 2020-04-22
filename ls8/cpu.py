@@ -8,10 +8,10 @@ program_filename = sys.argv[1]
 # print(sys.argv)
 # sys.exit()
 
-# LDI = 0b10000010
-# MULT = 0b10100010
-# PRN = 0b01000111
-# HLT = 0b00000001
+LDI = 0b10000010
+MULT = 0b10100010
+PRN = 0b01000111
+HLT = 0b00000001
 
 class CPU:
     """Main CPU class."""
@@ -24,9 +24,9 @@ class CPU:
         self.reg = [0] * 8  # returns 8 zeros and stores values (0-7)
         self.pc = 0 # Program counter, the index (address) of the current instruction
         self.running = True
-        self.LDI = 0b10000010
-        self.PRN = 0b01000111
-        self.HLT = 0b00000001
+        # self.LDI = 0b10000010
+        # self.PRN = 0b01000111
+        # self.HLT = 0b00000001
 
         # self.MULT = 0b10100010
 
@@ -123,7 +123,7 @@ class CPU:
             print(f"run: IR:",IR)
 
             # `LDI` instruction (EX: SAVE_REG in comp.py)
-            if IR == self.LDI:
+            if IR == LDI:
                 # print("HI")
                 register_num = self.ram_read(PC + 1) # operand_a (address)
                 value = self.ram_read(PC + 2) # operand_b (value)
@@ -137,7 +137,7 @@ class CPU:
 
             
             #`PRN` instruction (EX: PRINT_REG in comp.py)
-            elif IR == self.PRN:
+            elif IR == PRN:
                 register_num = self.ram_read(PC + 1) # operand_a (address)
                 value = self.reg[register_num]
                 print(f'self.PRN: value', value)
@@ -145,7 +145,7 @@ class CPU:
               
             
             #`HLT` instruction (EX: HALT in comp.py)
-            elif IR == self.HLT:
+            elif IR == HLT:
                 # print('LLLLL')
                 self.running = False
             
