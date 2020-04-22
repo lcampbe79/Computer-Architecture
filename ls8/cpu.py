@@ -37,10 +37,10 @@ G Greater-than: during a CMP, set to 1 if registerA is greater than registerB, z
 E Equal: during a CMP, set to 1 if registerA is equal to registerB, zero otherwise.
 '''
 
-LDI = 0b10000010
-MULT = 0b10100010
-PRN = 0b01000111
-HLT = 0b00000001
+    LDI = 0b10000010
+    MULT = 0b10100010
+    PRN = 0b01000111
+    HLT = 0b00000001
 
 class CPU:
     """Main CPU class."""
