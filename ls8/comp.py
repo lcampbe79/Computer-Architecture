@@ -15,6 +15,8 @@ PRINT_BEEJ = 1
 HALT = 2
 SAVE_REG = 3 # Store a value in a register (in LS8 called LDI)
 PRINT_REG = 4 # Corresponds with PRN in the LS8
+PUSH = 5
+POP = 6
 #^^^
 #Global Variables - change only in one place
 
@@ -39,6 +41,9 @@ memory = [
 memory = [0] * 256
 register = [0] * 8 # like variables but named the same R0-R7 ([0] * 8 means it returns 8 zeros)(stores values)
 
+# R7 is the SP
+SP = 7 # change all registers to SP to make it cleaner
+register[7] = 0xF4
 # Load program into memory
 address = 0
 
@@ -85,7 +90,18 @@ while running:
         value= register[register_num]
         print(value)
         pc += 2 # uses two
+    
+    elif instruction == PUSH: # PUSH R2 
+        #decrement the stack pointer
+        register[7] -= 1 # address_of_top_of_the_stack -= 1
 
+        #copy value from register into memory
+        register_num= memory[pc + 1]
+        value= register[register_num] # this is what i want to push
+
+        address = register[7] # index into memory
+        memory[address]= value # stores the value on the stack
+        pc += 2
     elif instruction == HALT:
         running = False
     
