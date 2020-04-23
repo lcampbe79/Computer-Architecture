@@ -33,7 +33,7 @@
 #     #branch_table[n]()
 
 #     f = branch_table[n]
-#     f(a)
+#     f()
 # call_funct(1)
 
 # with arguements
@@ -66,9 +66,10 @@ def call_funct(n, a):
         3: funct3,
         4: funct4
     }
-
+    #(n) is the key (points to 1:, 2:) can then call by value
     #branch_table[n]()
 
+    #means function to call (f) equals branch_table of n
     f = branch_table[n]
     f(a)
 

@@ -37,8 +37,12 @@ class CPU:
         self.PUSH = 0b01000101
         self.POP = 0b01000110
         self.HLT = 0b00000001
+        self.CALL = 0b1010000
+        self.RET = 0b00010001
+        self.ADD = 0b10100000
+        
 
-        # Turning the branch table into an object to be able to update easier
+        # Turning the branch table into a dictionary to be able to update easier
         self.branchtable = {
             self.LDI: self.ldi,
             self.MUL: self.multiply,
@@ -46,6 +50,9 @@ class CPU:
             self.PUSH: self.push,
             self.POP: self.pop,
             self.HLT: self.halt,
+            self.CALL: self.call,
+            self.RET: self.ret,
+            self.ADD: self.addition
         }
         
 
@@ -88,6 +95,12 @@ class CPU:
         self.alu('MULT', num_reg_a, num_reg_b)
         self.pc += 3
 
+    def addition(self):
+        num_reg_a = self.ram_read(self.pc + 1)
+        num_reg_b = self.ram_read(self.pc + 2)
+        self.alu('ADD', num_reg_a, num_reg_b)
+        self.pc += 3   
+
     def prn(self):
         register_num = self.ram_read(self.pc + 1) # operand_a (address)
         value = self.reg[register_num]
@@ -123,6 +136,29 @@ class CPU:
         
         # increment the Program Counter
         self.pc += 2
+    
+    def call(self):
+        # Get the address after the call so know where to return
+        return_address = self.pc + 2
+
+        #push on the stack using stack pointer
+        self.reg[self.SP] -= 1
+        self.ram[self.reg[self.SP]] = return_address
+
+        # Set the PC to the value in the given register
+        register_num = self.ram[self.pc + 1]
+        destination_address = self.reg[register_num]
+
+        # Sets the progam counter to the destination address
+        self.pc = destination_address
+
+    def ret(self):
+        # pop return address from top of the stack
+        return_address = self.ram[self.reg[self.SP]]
+        self.reg[self.SP] += 1
+
+        #set the pc so it knows where to return to
+        self.pc = return_address
 
     def halt(self):
         self.running = False
@@ -181,59 +217,6 @@ class CPU:
                 self.running = False
 
 
-            # register_num = self.ram_read(PC + 1) # operand_a (address)
-            # value = self.ram_read(PC + 2) # operand_b (value)
-            # print('-----------------')
-            # print(f"run: IR:",IR)
-            # print('-----------------')
-
-            # self.trace()
-            # `LDI` instruction (EX: SAVE_REG in comp.py)
-            # if IR == self.LDI:
-            #     self.trace()
-            #     # # print("HI")
-            #     register_num = self.ram_read(self.pc + 1) # operand_a (address)
-            #     value = self.ram_read(self.pc + 2) # operand_b (value)
-            #     self.reg[register_num] = value # adds the value to the register
-            #     # # print('-----------------')
-            #     # # print(f'LDI: value ', self.reg[register_num])
-            #     self.pc += 3
-            
-        
-            # elif IR == self.MULT:
-            #     num_reg_a = self.ram_read(self.pc + 1)
-            #     num_reg_b = self.ram_read(self.pc + 2)
-            #     self.alu('MULT', num_reg_a, num_reg_b)
-            #     self.pc += 3
-
-
-            # # self.trace()
-            # # #`PRN` instruction (EX: PRINT_REG in comp.py)
-            # elif IR == self.PRN:
-            #     self.trace()
-            #     register_num = self.ram_read(self.pc + 1) # operand_a (address)
-            #     value = self.reg[register_num]
-            #     # print('-----------------')
-            #     print(value)
-            #     self.pc += 2
-            # # # self.trace()  
-            
-            # # self.trace()
-            # #`HLT` instruction (EX: HALT in comp.py)
-            # elif IR == self.HLT:
-            #     self.trace()
-            # #     # print('LLLLL')
-            #     self.running = False
-            
-            #ELSE STATEMENT from comp.py
-            # self.trace()
-            # else:
-
-            #     print('Unknown instruction' )
-            #     self.running = False
-            #PC =
-
-        # self.trace() 
 
 # """CPU functionality."""
 
