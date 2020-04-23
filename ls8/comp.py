@@ -17,6 +17,8 @@ SAVE_REG = 3 # Store a value in a register (in LS8 called LDI)
 PRINT_REG = 4 # Corresponds with PRN in the LS8
 PUSH = 5
 POP = 6
+CALL = 7
+RETURN = 8
 #^^^
 #Global Variables - change only in one place
 
@@ -102,6 +104,31 @@ while running:
         address = register[7] # index into memory
         memory[address]= value # stores the value on the stack
         pc += 2
+    
+    elif instruction == CALL:
+        #compute  return address
+        return_address = pc + 2
+        #push just the value only
+
+        #push on the stack
+        register[SP] -= 1
+        memory[register[SP]] = return_address
+
+        # Set the PC to the value in the given register
+        register_num = memory[pc + 1]
+        destination_address = register[register_num]
+
+        pc = destination_address
+    
+    elif instruction == RETURN:
+        # pop return address from top of the stack
+        return_address = memory[register[SP]]
+        register[SP] += 1
+
+        #set the pc
+        pc = return_address
+        #can use auto call increment or not
+
     elif instruction == HALT:
         running = False
     
