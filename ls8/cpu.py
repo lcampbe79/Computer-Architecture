@@ -20,15 +20,22 @@ class CPU:
         """Construct a new CPU."""
         # Create memory
         self.ram =  [0] * 256 # length and the index will stop at 255
-        # I think add lines 27 (register), 28 (pc) and 29 (running) from comp.py
+
+        # Created Registers
         self.reg = [0] * 8  # returns 8 zeros and stores values (0-7)
+
         self.pc = 0 # Program counter, the index (address) of the current instruction
+
+        self.SP = 7 # R7 is reserved
+        self.reg[self.SP] = 0xF4
         self.running = True
 
         # Instructions
         self.LDI = 0b10000010
         self.MUL = 0b10100010
         self.PRN = 0b01000111
+        self.PUSH = 0b01000101
+        self.POP = 0b01000110
         self.HLT = 0b00000001
 
         # Turning the branch table into an object to be able to update easier
@@ -36,7 +43,9 @@ class CPU:
             self.LDI: self.ldi,
             self.MUL: self.multiply,
             self.PRN: self.prn,
-            self.HLT: self.halt
+            self.PUSH: self.push,
+            self.POP: self.pop,
+            self.HLT: self.halt,
         }
         
 
@@ -56,19 +65,16 @@ class CPU:
                 address +=1 #add one and goes to the next
 
     # MAR contains the address that is being read or written to. 
-    #ram_read() should accept the address (MAR) to read and return the value stored #there.
+    # ram_read() should accept the address (MAR) to read and return the value stored #there.
     def ram_read(self, MAR):
         return self.ram[MAR]
 
     # MDR contains the data that was read or the data to write. 
     # ram_write() should accept a value(MDR) to write, and the address (MAR) to write it to.
-
     def ram_write(self, MDR, MAR):
         self.ram[MAR] = MDR
 
-     ######################################
-    # Branch Table
-    
+    # Branch Table for the instruction object
     def ldi(self):        
         register_num = self.ram_read(self.pc + 1) # operand_a (address)
         value = self.ram_read(self.pc + 2) # operand_b (value)
@@ -85,14 +91,42 @@ class CPU:
     def prn(self):
         register_num = self.ram_read(self.pc + 1) # operand_a (address)
         value = self.reg[register_num]
-        # print('-----------------')
         print(value)
+        self.pc += 2
+    
+    def push(self):
+        # decrement the stack pointer (initializes @ F4, will then go to F3)
+        self.reg[self.SP] -= 1
+
+        #copy value from register into memory
+        register_num = self.ram[self.pc + 1]
+        value = self.reg[register_num] # this is what i want to push
+
+        stack_postion = self.reg[self.SP] # index into memory
+        self.ram[stack_postion] = value # stores the value on the stack
+        
+        # then increments the PC/program counter
+        self.pc += 2
+    
+    def pop(self):
+        # current stack pointer position
+        stack_postion = self.reg[self.SP]
+
+        # get current value from memory(RAM) from stack pointer
+        value = self.ram[stack_postion]
+
+        # add the value to the register
+        register_num = self.ram[self.pc + 1]
+        self.reg[register_num] = value
+        # Increment the stack pointer position
+        self.reg[self.SP] += 1
+        
+        # increment the Program Counter
         self.pc += 2
 
     def halt(self):
         self.running = False
 
-    
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -122,6 +156,11 @@ class CPU:
         for i in range(8):
             print(" %02i" % self.reg[i], end='')
 
+        print(" | Stack:", end='')
+        
+        for i in range(240, 244):
+            print(" %02i" % self.ram_read(i), end='')
+
         print()
 
     def run(self):
@@ -130,7 +169,9 @@ class CPU:
             
             # Stores the result in "Instruction Register" from the memory (RAM) address from the program
             IR = self.ram_read(self.pc)
-        
+
+            # as the branchtable moves down the branchtable object, it will "get" the instruction key,
+            # then move to the specified function to be run
             if self.branchtable.get(IR):
                 self.trace()
                 self.branchtable[IR]()
@@ -139,7 +180,7 @@ class CPU:
                 self.trace("End")
                 self.running = False
 
-                
+
             # register_num = self.ram_read(PC + 1) # operand_a (address)
             # value = self.ram_read(PC + 2) # operand_b (value)
             # print('-----------------')
